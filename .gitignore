@@ -1,0 +1,7 @@
+*.swp
+*.pyc
+*cache*
+*dist*
+*build*
+*playtest*
+*egg*
