@@ -37,7 +37,8 @@ class WPUser(Connectable):
 
         sql = """
               SELECT meta_value FROM wp_usermeta WHERE meta_key='{}'
-              """.format(key)
+              AND user_id={}
+              """.format(key, self.ID)
         
         cur.execute(sql)
         value = cur.fetchone()
@@ -47,7 +48,8 @@ class WPUser(Connectable):
         if value is None or value == '':
             sql = """
                   SELECT {} FROM wp_users
-                  """.format(key)
+                  WHERE ID={}
+                  """.format(key, self.ID)
         
         cur.execute(sql)
         value = cur.fetchone()[0]

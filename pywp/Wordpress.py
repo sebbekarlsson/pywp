@@ -97,3 +97,26 @@ class Wordpress(Connectable):
         post.commit()
 
         return post
+
+
+    def add_post_meta(self, post_id, meta_key, meta_value, unique=True):
+        real_meta_value = self.get_post(post_id).get(meta_key)
+
+        sql = """
+          INSERT INTO wp_postmeta (post_id, meta_key, meta_value)
+          VALUES ({}, '{}', '{}')
+          """.format(post_id, meta_key, meta_value)
+        if unique is True and real_meta_value is not None:
+            sql = """
+                  UPDATE wp_postmeta 
+                  SET meta_value='{meta_value}'
+                  WHERE post_id={post_id} AND meta_key='{meta_key}'
+                  """.format(post_id=post_id, meta_key=meta_key,
+                          meta_value=meta_value)
+
+        cur = self.mysql.cursor(pymysql.cursors.DictCursor)
+        cur.execute(sql)
+        self.mysql.commit()
+        cur.close()
+
+        return cur.lastrowid

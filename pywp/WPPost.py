@@ -70,7 +70,8 @@ class WPPost(Connectable):
 
         sql = """
               SELECT meta_value FROM wp_postmeta WHERE meta_key='{}'
-              """.format(key)
+              AND post_id={}
+              """.format(key, self.ID)
         
         cur.execute(sql)
         value = cur.fetchone()
@@ -80,10 +81,19 @@ class WPPost(Connectable):
         if value is None or value == '':
             sql = """
                   SELECT {} FROM wp_posts
-                  """.format(key)
+                  WHERE ID={}
+                  """.format(key, self.ID)
         
-        cur.execute(sql)
-        value = cur.fetchone()[0]
+        try:
+            cur.execute(sql)
+        except:
+            return None
+
+        value = cur.fetchone()
+        if value is not None:
+            value = value[0]
+        else:
+            return None
 
         cur.close()
 
