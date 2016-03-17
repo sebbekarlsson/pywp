@@ -5,7 +5,7 @@ import setuptools
 
 setup(
     name='pywp',
-    version='1.2',
+    version='1.3',
     install_requires=[
         'pymysql',
     ],
