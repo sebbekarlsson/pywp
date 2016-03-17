@@ -14,6 +14,7 @@ class Wordpress(Connectable):
     def get_pywp_user(self):
         return self.get_user(self.email)
 
+
     def get_user(self, email):
         cur = self.mysql.cursor(pymysql.cursors.DictCursor)
         sql = """
@@ -137,3 +138,18 @@ class Wordpress(Connectable):
         user.commit()
 
         return user.ID
+
+
+    def get_post_meta(self, post_id, key):
+        cur = self.mysql.cursor()
+
+        sql = """
+              SELECT meta_value FROM wp_postmeta WHERE meta_key='{}'
+              AND post_id={}
+              """.format(key, post_id)
+        
+        cur.execute(sql)
+        value = cur.fetchone()
+        cur.close()
+
+        return value
