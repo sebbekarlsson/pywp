@@ -11,11 +11,14 @@ class Wordpress(Connectable):
         self.email = email
 
 
-    def get_user(self):
+    def get_pywp_user(self):
+        return self.get_user(self.email)
+
+    def get_user(self, email):
         cur = self.mysql.cursor(pymysql.cursors.DictCursor)
         sql = """
               SELECT * FROM wp_users WHERE user_email='{}'
-              """.format(self.email)
+              """.format(email)
 
         cur.execute(sql)
         user_dict = cur.fetchone()
@@ -92,11 +95,13 @@ class Wordpress(Connectable):
         if 'ID' in args:
             args.popitem('ID')
 
-        post = WPPost(**args)
+        user = self.get_pywp_user()
+
+        post = WPPost(post_author=user.ID, **args)
         post.connect(self.connectionsetting)
         post.commit()
 
-        return post
+        return post.ID
 
 
     def add_post_meta(self, post_id, meta_key, meta_value, unique=True):
@@ -120,3 +125,15 @@ class Wordpress(Connectable):
         cur.close()
 
         return cur.lastrowid
+
+
+    def insert_user(self, **args):
+        if 'ID' in args:
+            args.popitem('ID')
+
+
+        user = WPUser(**args)
+        user.connect(self.connectionsetting)
+        user.commit()
+
+        return user.ID
